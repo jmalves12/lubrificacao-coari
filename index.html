@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Lubrif. COARI">
+<meta name="theme-color" content="#1a56db">
+<title>Lubrificação COARI</title>
+<link rel="manifest" href="data:application/json,{%22name%22:%22Lubrifica%C3%A7%C3%A3o%20COARI%22,%22short_name%22:%22Lubrif.%20COARI%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%231a56db%22,%22theme_color%22:%22%231a56db%22,%22icons%22:[{%22src%22:%22data:image/svg+xml,%3Csvg%20xmlns%3D%27http://www.w3.org/2000/svg%27%20viewBox%3D%270%200%20192%20192%27%3E%3Crect%20width%3D%27192%27%20height%3D%27192%27%20rx%3D%2732%27%20fill%3D%27%231a56db%27/%3E%3Ctext%20y%3D%27130%27%20x%3D%2796%27%20text-anchor%3D%27middle%27%20font-size%3D%27100%27%3E%F0%9F%94%A7%3C/text%3E%3C/svg%3E%22,%22sizes%22:%22192x192%22,%22type%22:%22image/svg+xml%22}]}">
+<style>
+:root{
+  --bg:#f0f2f5;--card:#fff;--fg:#111827;--sub:#6b7280;
+  --primary:#1a56db;--primary2:#1342b0;--pt:#e8effc;
+  --green:#16a34a;--gt:#dcfce7;
+  --yellow:#d97706;--yt:#fef3c7;
+  --red:#dc2626;--rt:#fee2e2;
+  --border:#e5e7eb;--sh:0 1px 3px rgba(0,0,0,.1),0 1px 2px rgba(0,0,0,.06);
+  --safe-t:env(safe-area-inset-top,0px);
+  --safe-b:env(safe-area-inset-bottom,0px);
+  --nav:64px;--bar:56px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+html{height:100%;overflow:hidden;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
+  background:var(--bg);color:var(--fg);height:100%;display:flex;flex-direction:column;
+  padding-top:calc(var(--bar) + var(--safe-t));padding-bottom:calc(var(--nav) + var(--safe-b));
+  overflow:hidden;}
+
+/* ── TOPBAR ── */
+.bar{position:fixed;top:0;left:0;right:0;z-index:200;
+  height:calc(var(--bar) + var(--safe-t));padding-top:var(--safe-t);
+  background:var(--primary);color:#fff;
+  display:flex;align-items:center;padding-left:12px;padding-right:8px;gap:8px;
+  box-shadow:0 2px 8px rgba(0,0,0,.25);}
+.bar-title{flex:1;min-width:0;}
+.bar-title h1{font-size:15px;font-weight:700;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bar-title p{font-size:11px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ibtn{background:rgba(255,255,255,.15);border:none;color:#fff;
+  width:40px;height:40px;border-radius:50%;font-size:18px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ibtn:active{background:rgba(255,255,255,.3);}
+.conn{display:flex;align-items:center;gap:4px;font-size:10px;
+  background:rgba(0,0,0,.2);padding:3px 8px;border-radius:20px;flex-shrink:0;}
+.dot{width:6px;height:6px;border-radius:50%;background:#f87171;}
+.dot.on{background:#4ade80;animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ── CONTEÚDO SCROLLÁVEL ── */
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}
+.page{display:none;padding:12px;max-width:480px;margin:0 auto;}
+.page.active{display:block;}
+
+/* ── SETUP ── */
+.hero{background:var(--primary);color:#fff;border-radius:16px;
+  padding:24px 20px;margin-bottom:14px;text-align:center;}
+.hero .icon{font-size:48px;margin-bottom:8px;}
+.hero h2{font-size:20px;font-weight:700;margin-bottom:4px;}
+.hero p{font-size:13px;opacity:.85;line-height:1.5;}
+.card{background:var(--card);border-radius:14px;box-shadow:var(--sh);margin-bottom:12px;overflow:hidden;}
+.pad{padding:16px;}
+.fg{margin-bottom:14px;}
+.fg label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.05em;color:var(--sub);margin-bottom:6px;}
+.fg input{width:100%;padding:13px 14px;border:1.5px solid var(--border);border-radius:10px;
+  font-size:16px;background:#fff;color:var(--fg);outline:none;}
+.fg input:focus{border-color:var(--primary);}
+.btn{width:100%;padding:15px;background:var(--primary);color:#fff;border:none;
+  border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;letter-spacing:.02em;}
+.btn:active{background:var(--primary2);}
+.btn-ghost{background:transparent;color:var(--sub);border:1.5px solid var(--border);margin-top:8px;font-size:14px;padding:12px;}
+
+/* ── SUMÁRIO ── */
+.sumario{border-radius:14px;background:var(--primary);color:#fff;
+  padding:16px;margin-bottom:12px;box-shadow:var(--sh);}
+.sumario-label{font-size:11px;opacity:.8;margin-bottom:6px;}
+.prog-wrap{background:rgba(255,255,255,.25);border-radius:8px;height:12px;margin-bottom:8px;}
+.prog-fill{height:100%;background:#fff;border-radius:8px;transition:width .5s ease;}
+.sumario-stats{display:flex;gap:16px;}
+.stat{text-align:center;}
+.stat-n{font-size:22px;font-weight:700;line-height:1;}
+.stat-l{font-size:10px;opacity:.75;margin-top:2px;}
+
+/* ── GRUPOS E EQUIPAMENTOS ── */
+.grp-hdr{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;
+  color:var(--sub);padding:14px 4px 6px;display:flex;align-items:center;gap:6px;}
+.grp-hdr::after{content:'';flex:1;height:1px;background:var(--border);}
+
+.eq{background:var(--card);border-radius:12px;margin-bottom:6px;
+  box-shadow:var(--sh);overflow:hidden;}
+.eq-hdr{display:flex;align-items:center;padding:13px 14px;gap:10px;cursor:pointer;user-select:none;}
+.eq-hdr:active{background:#f9fafb;}
+.eq-tag{font-size:14px;font-weight:800;color:var(--primary);min-width:70px;}
+.eq-mid{flex:1;min-width:0;}
+.eq-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.eq-sub{font-size:10px;color:var(--sub);margin-top:1px;}
+.pill{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;white-space:nowrap;flex-shrink:0;}
+.pOk{background:var(--gt);color:var(--green);}
+.pPend{background:var(--yt);color:var(--yellow);}
+.pZero{background:#f3f4f6;color:var(--sub);}
+.chev{font-size:20px;color:var(--sub);transition:transform .2s;flex-shrink:0;margin-left:2px;}
+.chev.open{transform:rotate(90deg);}
+
+/* ── PONTOS ── */
+.pts{display:none;border-top:1px solid var(--border);}
+.pts.open{display:block;}
+.pt{display:flex;align-items:center;padding:12px 14px 12px 16px;gap:12px;
+  cursor:pointer;border-bottom:1px solid var(--border);active}
+.pt:last-child{border-bottom:none;}
+.pt:active{background:#f9fafb;}
+.chk{width:30px;height:30px;border:2px solid var(--border);border-radius:8px;
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  font-size:18px;transition:all .15s;}
+.chk.ok{background:var(--green);border-color:var(--green);color:#fff;}
+.pt-info{flex:1;min-width:0;}
+.pt-name{font-size:13px;line-height:1.3;}
+.pt-meta{margin-top:3px;font-size:10px;color:var(--green);font-weight:600;}
+.pt-lubr{font-size:9px;color:var(--sub);}
+.freq{font-size:9px;font-weight:700;padding:2px 6px;border-radius:8px;text-transform:uppercase;flex-shrink:0;}
+.fD{background:#fee2e2;color:#b91c1c;}
+.fS{background:#dbeafe;color:#1d4ed8;}
+.fQ{background:#fef9c3;color:#a16207;}
+.fM{background:#f3e8ff;color:#7e22ce;}
+
+/* ── SEMANA ── */
+.week-card{background:var(--card);border-radius:14px;box-shadow:var(--sh);overflow:hidden;margin-bottom:12px;}
+.week-row{padding:12px 16px;border-bottom:1px solid var(--border);}
+.week-row:last-child{border-bottom:none;}
+.week-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.week-day{font-size:13px;font-weight:600;}
+.week-pts{font-size:11px;color:var(--sub);}
+.wbar{height:8px;background:var(--border);border-radius:4px;overflow:hidden;}
+.wbar-fill{height:100%;border-radius:4px;transition:width .4s;}
+
+/* ── RELATÓRIO ── */
+.rel-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;}
+.rs{background:var(--card);border-radius:12px;box-shadow:var(--sh);padding:14px;text-align:center;}
+.rs-n{font-size:28px;font-weight:800;}
+.rs-l{font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.04em;margin-top:2px;}
+.rel-list .eq-row{display:flex;justify-content:space-between;align-items:center;
+  padding:10px 16px;border-bottom:1px solid var(--border);font-size:13px;}
+.rel-list .eq-row:last-child{border-bottom:none;}
+
+/* ── BOTTOM NAV ── */
+.nav{position:fixed;bottom:0;left:0;right:0;z-index:200;
+  height:calc(var(--nav) + var(--safe-b));padding-bottom:var(--safe-b);
+  background:var(--card);border-top:1px solid var(--border);
+  display:none;align-items:stretch;}
+.nav.show{display:flex;}
+.ntab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-size:10px;font-weight:600;color:var(--sub);cursor:pointer;
+  border:none;background:none;gap:4px;padding:0 4px;}
+.ntab .ni{font-size:22px;line-height:1;}
+.ntab.active{color:var(--primary);}
+.ntab.active .ni{transform:scale(1.1);}
+
+/* ── FAB ── */
+.fab{position:fixed;bottom:calc(var(--nav) + var(--safe-b) + 14px);right:16px;
+  width:52px;height:52px;background:var(--primary);color:#fff;border:none;
+  border-radius:50%;font-size:22px;cursor:pointer;
+  box-shadow:0 4px 14px rgba(26,86,219,.5);
+  display:none;align-items:center;justify-content:center;z-index:190;}
+.fab.show{display:flex;}
+.fab:active{transform:scale(.93);}
+
+/* ── MODAL ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;
+  display:none;align-items:flex-end;}
+.overlay.open{display:flex;}
+.sheet{background:var(--card);border-radius:20px 20px 0 0;padding:20px;
+  width:100%;padding-bottom:calc(20px + var(--safe-b));}
+.sheet-handle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 16px;}
+.sheet h3{font-size:17px;font-weight:700;margin-bottom:16px;}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:calc(var(--nav) + var(--safe-b) + 70px);
+  left:50%;transform:translateX(-50%);background:#1f2937;color:#fff;
+  padding:10px 20px;border-radius:24px;font-size:13px;font-weight:500;
+  z-index:500;opacity:0;transition:opacity .25s;pointer-events:none;white-space:nowrap;}
+.toast.show{opacity:1;}
+
+/* ── VAZIO / LOADING ── */
+.empty{padding:48px 20px;text-align:center;color:var(--sub);}
+.empty .ei{font-size:48px;margin-bottom:12px;}
+.empty p{font-size:14px;}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="bar">
+  <div class="bar-title">
+    <h1 id="barTitle">🔧 Lubrificação COARI</h1>
+    <p id="barSub">Configure para começar</p>
+  </div>
+  <div class="conn"><span class="dot" id="dot"></span><span id="connTxt">…</span></div>
+  <button class="ibtn" onclick="abrirSheet()">✏️</button>
+</div>
+
+<!-- SCROLL -->
+<div class="scroll" id="scroll">
+  <!-- SETUP -->
+  <div class="page active" id="pSetup">
+    <div class="hero">
+      <div class="icon">🔧</div>
+      <h2>Lubrificação COARI</h2>
+      <p>App de controle em tempo real para toda a equipe — sem login, sem senha.</p>
+    </div>
+    <div class="card pad">
+      <div class="fg"><label>Data de hoje</label><input type="date" id="sData"></div>
+      <div class="fg"><label>Seu nome</label><input type="text" id="sLubr" placeholder="Ex: JOÃO SILVA" autocomplete="name" autocapitalize="words"></div>
+      <button class="btn" onclick="iniciar()">▶ Entrar no registro</button>
+      <button class="btn btn-ghost" onclick="sobrePWA()">📲 Instalar no celular</button>
+    </div>
+    <div style="text-align:center;font-size:11px;color:var(--sub);padding:8px 0 16px">
+      Dados compartilhados via Gun.js · Sem login necessário
+    </div>
+  </div>
+
+  <!-- HOJE -->
+  <div class="page" id="pHoje"></div>
+
+  <!-- SEMANA -->
+  <div class="page" id="pSemana"></div>
+
+  <!-- RELATÓRIO -->
+  <div class="page" id="pRel"></div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="nav" id="nav">
+  <button class="ntab" id="nHoje" onclick="irTab('hoje')">
+    <span class="ni">📋</span>Hoje
+  </button>
+  <button class="ntab" id="nSemana" onclick="irTab('semana')">
+    <span class="ni">📅</span>Semana
+  </button>
+  <button class="ntab" id="nRel" onclick="irTab('rel')">
+    <span class="ni">📊</span>Relatório
+  </button>
+  <button class="ntab" id="nCfg" onclick="irTab('setup')">
+    <span class="ni">⚙️</span>Config
+  </button>
+</div>
+
+<!-- FAB -->
+<button class="fab" id="fab" onclick="abrirSheet()">✏️</button>
+
+<!-- MODAL -->
+<div class="overlay" id="overlay" onclick="if(event.target===this)fecharSheet()">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <h3>Alterar dia / operador</h3>
+    <div class="fg"><label>Data</label><input type="date" id="mData"></div>
+    <div class="fg"><label>Seu nome</label><input type="text" id="mLubr" autocapitalize="words"></div>
+    <button class="btn" onclick="salvarSheet()">Salvar</button>
+    <button class="btn btn-ghost" onclick="fecharSheet()">Cancelar</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
+<script>
+/* ════════════════════════════════
+   FROTA COARI
+════════════════════════════════ */
+var P={
+  pa_case:[{n:'Pinos caçamba (4)',f:'D'},{n:'Pinos braços elevação (4)',f:'D'},{n:'Pinos cil. inclinação (2)',f:'D'},{n:'Pinos cil. elevação (4)',f:'D'},{n:'Articulação central',f:'S'},{n:'Rolamento eixo dianteiro',f:'S'},{n:'Rolamento eixo traseiro',f:'S'},{n:'Cruzeta cardã',f:'Q'},{n:'Pino balancim traseiro',f:'Q'},{n:'Coluna de direção',f:'M'}],
+  pa_jcb:[{n:'Pinos caçamba (4)',f:'D'},{n:'Pinos braços elevação (4)',f:'D'},{n:'Pinos cilindros (4)',f:'D'},{n:'Articulação central',f:'S'},{n:'Rolamentos eixos',f:'S'},{n:'Cruzeta cardã',f:'Q'}],
+  escav:[{n:'Pinos lança (3)',f:'D'},{n:'Pinos braço/stick (2)',f:'D'},{n:'Pinos caçamba (3)',f:'D'},{n:'Pinos cilindros (6)',f:'D'},{n:'Coroa de giro',f:'S'},{n:'Rolamento de giro',f:'S'},{n:'Pinos tensores esteira',f:'Q'},{n:'Mancais motor esteira',f:'M'}],
+  escav_k:[{n:'Pinos braços (4)',f:'D'},{n:'Pinos caçamba (2)',f:'D'},{n:'Pinos cilindros (4)',f:'D'},{n:'Mancais das rodas (4)',f:'S'},{n:'Correntes acionamento',f:'Q'}],
+  motor:[{n:'Pinos círculo de corte',f:'D'},{n:'Pinos cil. lâmina (4)',f:'D'},{n:'Articulação central',f:'D'},{n:'Rolamento do círculo',f:'S'},{n:'Dentes anel do círculo',f:'S'},{n:'Cruzetas cardã (2)',f:'S'},{n:'Articulação traseira',f:'Q'},{n:'Pinos escarificador',f:'Q'},{n:'Rolamentos eixos tandem',f:'M'}],
+  rolo:[{n:'Articulação central',f:'D'},{n:'Pinos cil. direção',f:'D'},{n:'Rolamentos tambor vibr.',f:'S'},{n:'Mancais eixo tambor (2)',f:'S'},{n:'Pivô direção',f:'Q'},{n:'Cruzeta cardã',f:'M'}],
+  esteira:[{n:'Rolete inferior (2 lados)',f:'S'},{n:'Rolete superior (2 lados)',f:'S'},{n:'Roda motriz (2)',f:'Q'},{n:'Roda tensora (2)',f:'Q'},{n:'Pivô de lâmina (4)',f:'S'},{n:'Pinos cil. lâmina (2)',f:'D'},{n:'Articulação inclinação',f:'Q'}],
+  retro:[{n:'Pinos lança traseira (4)',f:'D'},{n:'Pinos braço traseiro (2)',f:'D'},{n:'Pinos caçamba traseira (3)',f:'D'},{n:'Pinos concha dianteira (4)',f:'D'},{n:'Pinos estabilizadores (4)',f:'D'},{n:'Cruzeta eixo dianteiro',f:'S'},{n:'Articulação eixo traseiro',f:'Q'}],
+  trator:[{n:'Pivôs dianteiros (2)',f:'S'},{n:'Cruzeta cardã',f:'S'},{n:'Pinos implement. (4)',f:'D'},{n:'Rolamentos de roda (4)',f:'Q'},{n:'Articulação direção',f:'Q'}],
+  recicl:[{n:'Articulação central',f:'D'},{n:'Pinos cil. direção',f:'D'},{n:'Mancais rotor (2)',f:'S'},{n:'Cruzeta cardã (2)',f:'Q'},{n:'Rolamentos roda (4)',f:'Q'}],
+  basculante:[{n:'Pinos caçamba/charneira (4)',f:'S'},{n:'Cruzetas cardã (2)',f:'S'},{n:'Bucha lança (2)',f:'Q'},{n:'Mancais eixo traseiro',f:'Q'},{n:'Rolamentos roda (6)',f:'M'}],
+  betoneira:[{n:'Cruzetas cardã (3)',f:'S'},{n:'Rolamentos eixo traseiro',f:'Q'},{n:'Pinos tambor betoneira',f:'S'}],
+  pipa:[{n:'Cruzetas cardã (2)',f:'S'},{n:'Rolamentos eixo traseiro',f:'Q'},{n:"Mancais bomba d'água",f:'Q'}],
+  munck:[{n:'Cruzetas cardã (2)',f:'S'},{n:'Pinos lança guindaste (4)',f:'S'},{n:'Giro guindaste',f:'Q'},{n:'Mancais estabilizadores',f:'Q'}],
+  caminhao:[{n:'Cruzetas cardã (2)',f:'S'},{n:'Rolamentos eixo traseiro',f:'Q'}],
+  cavalo:[{n:'Cruzetas cardã (3)',f:'S'},{n:'Kingpin (2)',f:'Q'},{n:'Rolamentos eixo traseiro',f:'Q'}],
+  leve:[{n:'Pivôs dianteiros (2)',f:'Q'},{n:'Cruzeta cardã',f:'Q'},{n:'Rolamentos roda (4)',f:'M'}],
+  grade:[{n:'Mancais dos discos',f:'S'},{n:'Pinos do engate (3)',f:'S'}],
+  vassoura:[{n:'Articulação central',f:'D'},{n:'Mancais escova (2)',f:'S'},{n:'Cruzeta cardã',f:'Q'}],
+  rocad:[{n:'Pinos engate (2)',f:'S'},{n:'Mancais lâmina/eixo',f:'S'}],
+  gerador:[{n:'Rolamentos do alternador',f:'M'},{n:'Bucha caixa transmissão',f:'M'}],
+};
+function cp(k){return P[k].map(function(p){return{n:p.n,f:p.f};});}
+
+var FROTA=[
+  {tag:'PMW-54',tipo:'PÁ CARREGADEIRA',modelo:'CASE W20E',p:cp('pa_case')},
+  {tag:'PMW-61',tipo:'PÁ CARREGADEIRA',modelo:'CASE W20E',p:cp('pa_case')},
+  {tag:'PMW-78',tipo:'PÁ CARREGADEIRA',modelo:'CASE W20E',p:cp('pa_case')},
+  {tag:'PMJ-03',tipo:'PÁ CARREGADEIRA',modelo:'JCB 422ZX',p:cp('pa_jcb')},
+  {tag:'EHJ-01',tipo:'ESCAVADEIRA',modelo:'JCB 220LC BR E',p:cp('escav')},
+  {tag:'EHJ-02',tipo:'ESCAVADEIRA',modelo:'JCB JS210SC BR',p:cp('escav')},
+  {tag:'EHJ-04',tipo:'ESCAVADEIRA',modelo:'JCB JS210SC BR',p:cp('escav')},
+  {tag:'ENH-02',tipo:'ESCAVADEIRA',modelo:'NEW HOLLAND E215B',p:cp('escav')},
+  {tag:'ESK-02',tipo:'ESCAVADEIRA',modelo:'KOMATSU PC160LC',p:cp('escav_k')},
+  {tag:'MCS-01',tipo:'MOTONIVELADORA',modelo:'CASE 845B',p:cp('motor')},
+  {tag:'MNN-02',tipo:'MOTONIVELADORA',modelo:'NEW HOLLAND RG140B',p:cp('motor')},
+  {tag:'MNN-07',tipo:'MOTONIVELADORA',modelo:'NEW HOLLAND RG140B',p:cp('motor')},
+  {tag:'MNX-01',tipo:'MOTONIVELADORA',modelo:'XCMG GR1803BR',p:cp('motor')},
+  {tag:'RVC-02',tipo:'ROLO VIBRATÓRIO',modelo:'CATERPILLAR CB10',p:cp('rolo')},
+  {tag:'RVJ-01',tipo:'ROLO VIBRATÓRIO',modelo:'JCB 116D',p:cp('rolo')},
+  {tag:'RVL-01',tipo:'ROLO VIBRATÓRIO',modelo:'LIUGONG CLG 612H',p:cp('rolo')},
+  {tag:'RVM-36',tipo:'ROLO VIBRATÓRIO',modelo:'MULLER VAP-70',p:cp('rolo')},
+  {tag:'RVM-39',tipo:'ROLO VIBRATÓRIO',modelo:'MULLER VAP-70',p:cp('rolo')},
+  {tag:'RVM-42',tipo:'ROLO VIBRATÓRIO',modelo:'MULLER VAP-70',p:cp('rolo')},
+  {tag:'TEC-35',tipo:'TRATOR DE ESTEIRAS',modelo:'CATERPILLAR D4',p:cp('esteira')},
+  {tag:'TEJ-01',tipo:'TRATOR DE ESTEIRAS',modelo:'JOHN DEERE 750J',p:cp('esteira')},
+  {tag:'TEN-07',tipo:'TRATOR DE ESTEIRAS',modelo:'NEW HOLLAND D130',p:cp('esteira')},
+  {tag:'REC-01',tipo:'RETROESCAVADEIRA',modelo:'CATERPILLAR 416',p:cp('retro')},
+  {tag:'RMF-01',tipo:'RETROESCAVADEIRA',modelo:'MASSEY FERGUSON MF96',p:cp('retro')},
+  {tag:'TRC-01',tipo:'TRATOR DE RODAS',modelo:'CASE MAXXUM 135',p:cp('trator')},
+  {tag:'TRV-05',tipo:'TRATOR DE RODAS',modelo:'VALTRA BM 100',p:cp('trator')},
+  {tag:'RET-01',tipo:'RECICLADORA PAVI.',modelo:'TEREX RS425C',p:cp('recicl')},
+  {tag:'CBM-68',tipo:'CAMINHÃO BASCULANTE',modelo:'MERCEDES ATEGO',p:cp('basculante')},
+  {tag:'CBT-06',tipo:'CAMINHÃO BASCULANTE',modelo:'IVECO 170E22',p:cp('basculante')},
+  {tag:'CBT-11',tipo:'CAMINHÃO BASCULANTE',modelo:'IVECO 170E22',p:cp('basculante')},
+  {tag:'CBT-12',tipo:'CAMINHÃO BASCULANTE',modelo:'IVECO 260E30',p:cp('basculante')},
+  {tag:'CBV-95',tipo:'CAMINHÃO BASCULANTE',modelo:'VW 17-250E',p:cp('basculante')},
+  {tag:'CBV-114',tipo:'CAMINHÃO BASCULANTE',modelo:'VW 24-220E3W',p:cp('basculante')},
+  {tag:'CBV-118',tipo:'CAMINHÃO BASCULANTE',modelo:'VW 26.280',p:cp('basculante')},
+  {tag:'CBV-119',tipo:'CAMINHÃO BASCULANTE',modelo:'VW 26.280',p:cp('basculante')},
+  {tag:'ABF-01',tipo:'CAMINHÃO BETONEIRA',modelo:'FORD CARGO 2628 LIEBHERR',p:cp('betoneira')},
+  {tag:'ABF-03',tipo:'CAMINHÃO BETONEIRA',modelo:'FORD CARGO 2628',p:cp('betoneira')},
+  {tag:'ABF-04',tipo:'CAMINHÃO BETONEIRA',modelo:'FORD CARGO 2628',p:cp('betoneira')},
+  {tag:'ABV-01',tipo:'CAMINHÃO BETONEIRA',modelo:'VOLVO VM 270',p:cp('betoneira')},
+  {tag:'ABV-02',tipo:'CAMINHÃO BETONEIRA',modelo:'VOLVO VM 270',p:cp('betoneira')},
+  {tag:'CPV-64',tipo:'CAMINHÃO PIPA',modelo:'VW 24220',p:cp('pipa')},
+  {tag:'CPV-65',tipo:'CAMINHÃO PIPA',modelo:'VW 17190',p:cp('pipa')},
+  {tag:'CPV-70',tipo:'CAMINHÃO PIPA',modelo:'VW 15.190 ROBUST',p:cp('pipa')},
+  {tag:'CLV-08',tipo:'CAMINHÃO LUBR.',modelo:'VW 13190 ROBUST',p:cp('caminhao')},
+  {tag:'CMF-04',tipo:'CAMINHÃO MUNCK',modelo:'FORD CARGO 2629',p:cp('munck')},
+  {tag:'CAI-01',tipo:'CAMINHÃO CARGA SECA',modelo:'IVECO 90V18',p:cp('caminhao')},
+  {tag:'CTF-02',tipo:'CAMINHÃO TANQUE',modelo:'FORD CARGO 2623',p:cp('caminhao')},
+  {tag:'CMW-01',tipo:'CAVALO MECÂNICO',modelo:'VW 25370',p:cp('cavalo')},
+  {tag:'ACM-22',tipo:'CAMINHONETE',modelo:'MITSUBISHI L200 OUTDOOR',p:cp('leve')},
+  {tag:'ACM-32',tipo:'CAMINHONETE',modelo:'MITSUBISHI L200 TRITON',p:cp('leve')},
+  {tag:'ACM-34',tipo:'CAMINHONETE',modelo:'MITSUBISHI L200 TRITON',p:cp('leve')},
+  {tag:'MOV-01',tipo:'MICRO-ÔNIBUS',modelo:'MARCOPOLO VOLARE W9',p:cp('leve')},
+  {tag:'MOR-02',tipo:'VAN',modelo:'RENAULT MASTER',p:cp('leve')},
+  {tag:'GDB-49',tipo:'GRADE DE DISCO',modelo:'BALDAN CRI 18',p:cp('grade')},
+  {tag:'GDP-42',tipo:'GRADE DE DISCO',modelo:'PICCIN GAP 16',p:cp('grade')},
+  {tag:'GDP-45',tipo:'GRADE DE DISCO',modelo:'PICCIN GAP 16',p:cp('grade')},
+  {tag:'GDP-46',tipo:'GRADE DE DISCO',modelo:'PICCIN GAP 16',p:cp('grade')},
+  {tag:'VME-01',tipo:'VASSOURA MECÂNICA',modelo:'VM-100',p:cp('vassoura')},
+  {tag:'MRA-04',tipo:'ROÇADEIRA REBOC.',modelo:'ALGOR ARA 1800',p:cp('rocad')},
+  {tag:'MRA-06',tipo:'ROÇADEIRA REBOC.',modelo:'ALGOR ARA 1800',p:cp('rocad')},
+  {tag:'GGM-83',tipo:'GRUPO GERADOR',modelo:'MWM 6.10TCA 180KVA',p:cp('gerador')},
+  {tag:'GGM-84',tipo:'GRUPO GERADOR',modelo:'MWM 6.10TCA 180KVA',p:cp('gerador')},
+];
+
+/* ════════ ESTADO ════════ */
+var ST={data:hj(),lubr:'',tab:'hoje'};
+function hj(){return new Date().toISOString().slice(0,10);}
+function ldST(){try{var s=JSON.parse(localStorage.getItem('lc4')||'{}');if(s.data)ST.data=s.data;if(s.lubr)ST.lubr=s.lubr;if(s.tab)ST.tab=s.tab;}catch(e){}}
+function svST(){try{localStorage.setItem('lc4',JSON.stringify(ST));}catch(e){}}
+
+/* ════════ GUN ════════ */
+var gun=null,xNode=null,EXEC={},rt=null;
+function initGun(){
+  try{
+    gun=Gun({peers:['https://gun-manhattan.herokuapp.com/gun','https://peer.wallie.io/gun','https://gundb-relay-server.glitch.me/gun'],localStorage:true});
+    xNode=gun.get('lubr-coari-v1').get('exec');
+    gun.on('hi',function(){setConn(true);});
+    gun.on('bye',function(){setConn(false);});
+    subDia(ST.data);
+    setTimeout(function(){if(!document.getElementById('dot').classList.contains('on'))setConn(false);},7000);
+  }catch(e){setConn(false);}
+}
+function subDia(data){
+  EXEC={};
+  if(!xNode)return;
+  xNode.map().on(function(v,id){
+    if(!id||!id.startsWith(data+'_'))return;
+    if(v&&v.h)EXEC[id]={h:v.h,l:v.l||'—'};
+    else delete EXEC[id];
+    agendar();
+  });
+}
+function setConn(ok){
+  document.getElementById('dot').className='dot'+(ok?' on':'');
+  document.getElementById('connTxt').textContent=ok?'Online':'Offline';
+}
+function did(data,tag,idx){return data+'_'+tag.replace(/[^a-zA-Z0-9]/g,'-')+'_'+idx;}
+function getEx(tag,idx){return EXEC[did(ST.data,tag,idx)]||null;}
+function setEx(tag,idx,val){
+  var id=did(ST.data,tag,idx);
+  if(val){EXEC[id]=val;if(xNode)xNode.get(id).put({h:val.h,l:val.l,d:ST.data,ts:Date.now()});}
+  else{delete EXEC[id];if(xNode)xNode.get(id).put(null);}
+}
+
+/* ════════ FREQUÊNCIA ════════ */
+var FL={D:'Diária',S:'Semanal',Q:'Quinzenal',M:'Mensal'};
+var FC={D:'fD',S:'fS',Q:'fQ',M:'fM'};
+function deveHj(f,ds){
+  var d=new Date(ds+'T12:00:00'),dow=d.getDay();
+  if(f==='D')return true;
+  if(f==='S')return dow===1;
+  if(f==='Q'){var s=new Date(d.getFullYear(),0,1),w=Math.ceil(((d-s)/86400000+1)/7);return w%2===1;}
+  if(f==='M'){var fm=new Date(d.getFullYear(),d.getMonth(),1);while(fm.getDay()!==1)fm.setDate(fm.getDate()+1);return d.toDateString()===fm.toDateString();}
+  return false;
+}
+
+/* ════════ PROGRESSO ════════ */
+function progEq(eq){
+  var pts=eq.p.filter(function(p){return deveHj(p.f,ST.data);});
+  var done=pts.filter(function(p){return!!getEx(eq.tag,eq.p.indexOf(p));}).length;
+  return{total:pts.length,done:done,pct:pts.length?Math.round(done/pts.length*100):0};
+}
+function progTotal(){
+  var t=0,d=0;
+  FROTA.forEach(function(eq){var p=progEq(eq);t+=p.total;d+=p.done;});
+  return{total:t,done:d,pct:t?Math.round(d/t*100):0};
+}
+
+/* ════════ RENDER ════════ */
+function fmtD(ds){
+  var d=new Date(ds+'T12:00:00');
+  return d.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+}
+function fmtSh(ds){
+  var d=new Date(ds+'T12:00:00');
+  return d.toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'2-digit'});
+}
+
+function buildHoje(){
+  var prog=progTotal();
+  var grps={},ord=[];
+  FROTA.forEach(function(eq){if(!grps[eq.tipo]){grps[eq.tipo]=[];ord.push(eq.tipo);}grps[eq.tipo].push(eq);});
+
+  var h='<div class="sumario">';
+  h+='<div class="sumario-label">'+fmtD(ST.data)+'  •  '+ST.lubr+'</div>';
+  h+='<div class="prog-wrap"><div class="prog-fill" style="width:'+prog.pct+'%"></div></div>';
+  h+='<div class="sumario-stats">';
+  h+='<div class="stat"><div class="stat-n">'+prog.done+'</div><div class="stat-l">Feitos</div></div>';
+  h+='<div class="stat"><div class="stat-n">'+(prog.total-prog.done)+'</div><div class="stat-l">Pendentes</div></div>';
+  h+='<div class="stat"><div class="stat-n">'+prog.pct+'%</div><div class="stat-l">Progresso</div></div>';
+  h+='</div></div>';
+
+  ord.forEach(function(tipo){
+    h+='<div class="grp-hdr">'+tipo+'</div>';
+    grps[tipo].forEach(function(eq){
+      var pg=progEq(eq);
+      var pc='pZero',pt='—';
+      if(pg.total>0){if(pg.done===pg.total){pc='pOk';pt='✓ '+pg.total;}else if(pg.done>0){pc='pPend';pt=pg.done+'/'+pg.total;}else{pc='pZero';pt='0/'+pg.total;}}
+      var eid='e_'+eq.tag.replace(/[^a-z0-9]/gi,'_');
+      h+='<div class="eq"><div class="eq-hdr" onclick="togEq(\''+eid+'\')">';
+      h+='<div class="eq-tag">'+eq.tag+'</div>';
+      h+='<div class="eq-mid"><div class="eq-name">'+eq.tag+'</div><div class="eq-sub">'+eq.modelo+'</div></div>';
+      h+='<span class="pill '+pc+'">'+pt+'</span>';
+      h+='<span class="chev" id="cv_'+eid+'">›</span></div>';
+      if(pg.total>0){
+        h+='<div class="pts" id="'+eid+'">';
+        eq.p.forEach(function(pt2,idx){
+          if(!deveHj(pt2.f,ST.data))return;
+          var ex=getEx(eq.tag,idx);
+          h+='<div class="pt" onclick="toggle(\''+eq.tag+'\','+idx+')">';
+          h+='<div class="chk'+(ex?' ok':'')+'">'+( ex?'✓':'' )+'</div>';
+          h+='<div class="pt-info"><div class="pt-name">'+pt2.n+'</div>';
+          if(ex)h+='<div class="pt-meta">'+ex.h+'</div><div class="pt-lubr">'+ex.l+'</div>';
+          h+='</div><span class="freq '+FC[pt2.f]+'">'+FL[pt2.f]+'</span></div>';
+        });
+        h+='</div>';
+      }
+      h+='</div>';
+    });
+  });
+  return h;
+}
+
+function reRenderHoje(){
+  var abertos=Array.from(document.querySelectorAll('.pts.open')).map(function(e){return e.id;});
+  var sc=document.getElementById('scroll').scrollTop;
+  document.getElementById('pHoje').innerHTML=buildHoje();
+  abertos.forEach(function(id){
+    var el=document.getElementById(id);if(!el)return;
+    el.classList.add('open');
+    var cv=document.getElementById('cv_'+id);if(cv)cv.classList.add('open');
+  });
+  document.getElementById('scroll').scrollTop=sc;
+}
+
+function buildSemana(){
+  var base=new Date(ST.data+'T12:00:00'),dow=base.getDay();
+  var seg=new Date(base);seg.setDate(base.getDate()-(dow===0?6:dow-1));
+  var h='<div style="font-size:13px;color:var(--sub);margin-bottom:10px;padding:0 2px">Semana atual — progresso de hoje</div>';
+  h+='<div class="week-card">';
+  for(var i=0;i<7;i++){
+    var d=new Date(seg);d.setDate(seg.getDate()+i);
+    var ds=d.toISOString().slice(0,10);
+    var isH=(ds===ST.data);
+    var pg=isH?progTotal():{total:0,done:0,pct:0};
+    var cor=isH?(pg.pct===100?'var(--green)':pg.pct>0?'var(--yellow)':'var(--border)'):'var(--border)';
+    h+='<div class="week-row" style="'+(isH?'background:var(--pt)':'')+'">'+
+      '<div class="week-top">'+
+        '<span class="week-day" style="color:'+(isH?'var(--primary)':'var(--fg)')+'">'+fmtSh(ds)+(isH?' ◀':'')+'</span>'+
+        '<span class="week-pts">'+(isH?(pg.done+'/'+pg.total):'—')+'</span></div>'+
+      '<div class="wbar"><div class="wbar-fill" style="width:'+pg.pct+'%;background:'+cor+'"></div></div></div>';
+  }
+  h+='</div>';
+  return h;
+}
+
+function buildRel(){
+  var pg=progTotal();
+  var pend=FROTA.filter(function(eq){var p=progEq(eq);return p.total>0&&p.done<p.total;});
+  var ok=FROTA.filter(function(eq){var p=progEq(eq);return p.total>0&&p.done===p.total;});
+  var h='<div style="font-size:13px;color:var(--sub);margin-bottom:10px;padding:0 2px">'+fmtD(ST.data)+'  •  '+ST.lubr+'</div>';
+  h+='<div class="rel-stats">';
+  h+='<div class="rs"><div class="rs-n" style="color:var(--green)">'+pg.done+'</div><div class="rs-l">Feitos</div></div>';
+  h+='<div class="rs"><div class="rs-n" style="color:var(--yellow)">'+(pg.total-pg.done)+'</div><div class="rs-l">Pendentes</div></div>';
+  h+='<div class="rs"><div class="rs-n">'+pg.pct+'%</div><div class="rs-l">Progresso</div></div>';
+  h+='</div>';
+  if(pend.length){
+    h+='<div class="card" style="margin-bottom:12px"><div style="padding:10px 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--yellow);border-bottom:1px solid var(--border)">⚠ Pendentes ('+pend.length+')</div><div class="rel-list">';
+    pend.forEach(function(eq){var p=progEq(eq);h+='<div class="eq-row"><span style="font-weight:600">'+eq.tag+'</span><span style="color:var(--sub)">'+p.done+'/'+p.total+'</span></div>';});
+    h+='</div></div>';
+  }
+  if(ok.length){
+    h+='<div class="card" style="margin-bottom:12px"><div style="padding:10px 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--green);border-bottom:1px solid var(--border)">✓ Concluídos ('+ok.length+')</div><div class="rel-list">';
+    ok.forEach(function(eq){h+='<div class="eq-row"><span style="font-weight:600">'+eq.tag+'</span><span style="color:var(--green)">✓</span></div>';});
+    h+='</div></div>';
+  }
+  h+='<div style="display:flex;gap:8px;margin-bottom:16px">';
+  h+='<button class="btn" onclick="window.print()" style="flex:1;font-size:14px;padding:13px">🖨 Imprimir</button>';
+  h+='<button class="btn btn-ghost" onclick="copiar()" style="flex:1;font-size:14px;padding:13px">📋 Copiar</button>';
+  h+='</div>';
+  return h;
+}
+
+function agendar(){
+  if(rt)clearTimeout(rt);
+  rt=setTimeout(function(){
+    if(ST.tab==='hoje')reRenderHoje();
+    if(ST.tab==='rel')document.getElementById('pRel').innerHTML=buildRel();
+    rt=null;
+  },150);
+}
+
+/* ════════ AÇÕES ════════ */
+function togEq(eid){
+  var el=document.getElementById(eid),cv=document.getElementById('cv_'+eid);
+  if(!el)return;
+  el.classList.toggle('open');if(cv)cv.classList.toggle('open');
+}
+
+function toggle(tag,idx){
+  var ex=getEx(tag,idx);
+  if(ex){setEx(tag,idx,null);}
+  else{var h=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});setEx(tag,idx,{h:h,l:ST.lubr||'—'});}
+  agendar();
+}
+
+function iniciar(){
+  var d=document.getElementById('sData').value;
+  var l=document.getElementById('sLubr').value.trim().toUpperCase();
+  if(!d){toast('Informe a data');return;}
+  if(!l){toast('Informe seu nome');return;}
+  ST.data=d;ST.lubr=l;svST();
+  EXEC={};subDia(d);
+  irTab('hoje');
+}
+
+function irTab(tab){
+  ST.tab=tab;svST();
+  var conf=!!ST.lubr;
+  document.getElementById('nav').className='nav'+(conf?' show':'');
+  document.getElementById('fab').className='fab'+(conf&&tab==='hoje'?' show':'');
+  var sub=document.getElementById('barSub');
+  if(conf){var d=new Date(ST.data+'T12:00:00');sub.textContent=d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})+' · '+ST.lubr;}
+  else sub.textContent='Configure para começar';
+  ['pSetup','pHoje','pSemana','pRel'].forEach(function(id){document.getElementById(id).classList.remove('active');});
+  ['nHoje','nSemana','nRel','nCfg'].forEach(function(id){var el=document.getElementById(id);if(el)el.classList.remove('active');});
+  document.getElementById('scroll').scrollTo(0,0);
+  if(!conf||tab==='setup'){
+    document.getElementById('sData').value=ST.data||hj();
+    document.getElementById('sLubr').value=ST.lubr||'';
+    document.getElementById('pSetup').classList.add('active');
+    document.getElementById('nCfg').classList.add('active');
+  }else if(tab==='hoje'){
+    document.getElementById('pHoje').innerHTML=buildHoje();
+    document.getElementById('pHoje').classList.add('active');
+    document.getElementById('nHoje').classList.add('active');
+  }else if(tab==='semana'){
+    document.getElementById('pSemana').innerHTML=buildSemana();
+    document.getElementById('pSemana').classList.add('active');
+    document.getElementById('nSemana').classList.add('active');
+  }else if(tab==='rel'){
+    document.getElementById('pRel').innerHTML=buildRel();
+    document.getElementById('pRel').classList.add('active');
+    document.getElementById('nRel').classList.add('active');
+  }
+}
+
+function abrirSheet(){
+  document.getElementById('mData').value=ST.data;
+  document.getElementById('mLubr').value=ST.lubr;
+  document.getElementById('overlay').classList.add('open');
+}
+function fecharSheet(){document.getElementById('overlay').classList.remove('open');}
+function salvarSheet(){
+  var d=document.getElementById('mData').value,l=document.getElementById('mLubr').value.trim().toUpperCase();
+  if(d&&d!==ST.data){ST.data=d;EXEC={};subDia(d);}
+  if(l)ST.lubr=l;
+  svST();fecharSheet();irTab(ST.tab||'hoje');
+}
+
+function copiar(){
+  var txt='LUBRIFICAÇÃO COARI — '+fmtD(ST.data)+'\nOperador: '+ST.lubr+'\n\n';
+  FROTA.forEach(function(eq){
+    var pg=progEq(eq);if(!pg.total)return;
+    txt+=eq.tag+' ('+pg.done+'/'+pg.total+')\n';
+    eq.p.forEach(function(pt,idx){
+      if(!deveHj(pt.f,ST.data))return;
+      var ex=getEx(eq.tag,idx);
+      txt+='  '+(ex?'[✓]':'[ ]')+' '+pt.n+(ex?' '+ex.h+' — '+ex.l:'')+'\n';
+    });
+    txt+='\n';
+  });
+  try{navigator.clipboard.writeText(txt);toast('Relatório copiado!');}
+  catch(e){prompt('Copie:',txt);}
+}
+
+function sobrePWA(){
+  var msg='Para instalar como app:\n\n📱 Android (Chrome):\nToque nos 3 pontos → "Adicionar à tela inicial"\n\n🍎 iPhone (Safari):\nToque em Compartilhar ↑ → "Adicionar à Tela de Início"';
+  alert(msg);
+}
+
+function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2500);}
+
+/* ════════ INIT ════════ */
+ldST();
+if(!ST.data)ST.data=hj();
+document.getElementById('sData').value=ST.data;
+document.getElementById('sLubr').value=ST.lubr||'';
+irTab(ST.lubr?(ST.tab||'hoje'):'setup');
+initGun();
+
+/* Service Worker inline para PWA */
+if('serviceWorker' in navigator){
+  var sw='self.addEventListener("install",function(e){e.waitUntil(caches.open("lc-v1").then(function(c){return c.addAll([location.href]);}));});'
+       +'self.addEventListener("fetch",function(e){e.respondWith(caches.match(e.request).then(function(r){return r||fetch(e.request).catch(function(){return caches.match(location.href);});}));});';
+  var blob=new Blob([sw],{type:'application/javascript'});
+  var url=URL.createObjectURL(blob);
+  navigator.serviceWorker.register(url).catch(function(){});
+}
+</script>
+</body>
+</html>
