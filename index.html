@@ -364,38 +364,68 @@ function hj(){return new Date().toISOString().slice(0,10);}
 function ldST(){try{var s=JSON.parse(localStorage.getItem('lc4')||'{}');if(s.data)ST.data=s.data;if(s.lubr)ST.lubr=s.lubr;if(s.tab)ST.tab=s.tab;}catch(e){}}
 function svST(){try{localStorage.setItem('lc4',JSON.stringify(ST));}catch(e){}}
 
-/* ════════ GUN ════════ */
-var gun=null,xNode=null,EXEC={},rt=null;
+/* ════════ GUN — SYNC CONFIÁVEL ════════
+   Relays ativos 2026. Usa flag {del:true} em vez
+   de put(null) pois Gun não propaga null bem.
+════════ */
+var gun=null,xNode=null,EXEC={},rt=null,connOk=false;
+
+var PEERS=[
+  'wss://peer.wallie.io/gun',
+  'https://peer.wallie.io/gun',
+  'wss://gun.eco/gun',
+  'https://gun.eco/gun',
+  'wss://relay.peer.ooo/gun'
+];
+
 function initGun(){
   try{
-    gun=Gun({peers:['https://gun-manhattan.herokuapp.com/gun','https://peer.wallie.io/gun','https://gundb-relay-server.glitch.me/gun'],localStorage:true});
-    xNode=gun.get('lubr-coari-v1').get('exec');
-    gun.on('hi',function(){setConn(true);});
-    gun.on('bye',function(){setConn(false);});
+    gun=Gun({peers:PEERS,localStorage:true,radisk:false});
+    xNode=gun.get('lubr-coari-2026').get('exec');
+    /* Detectar conexão via heartbeat */
+    gun.on('hi',function(){if(!connOk){connOk=true;setConn(true);}});
+    gun.on('bye',function(){connOk=false;setConn(false);});
+    /* Fallback: testar escrita dummy após 4s */
+    setTimeout(function(){
+      if(!connOk){
+        gun.get('lubr-coari-2026').get('_ping').put({t:Date.now()},function(ack){
+          if(!ack.err){connOk=true;setConn(true);}else{setConn(false);}
+        });
+      }
+    },4000);
     subDia(ST.data);
-    setTimeout(function(){if(!document.getElementById('dot').classList.contains('on'))setConn(false);},7000);
   }catch(e){setConn(false);}
 }
+
 function subDia(data){
   EXEC={};
   if(!xNode)return;
   xNode.map().on(function(v,id){
     if(!id||!id.startsWith(data+'_'))return;
-    if(v&&v.h)EXEC[id]={h:v.h,l:v.l||'—'};
-    else delete EXEC[id];
+    /* del:true = ponto desmarcado */
+    if(v&&v.h&&!v.del){EXEC[id]={h:v.h,l:v.l||'—'};}
+    else{delete EXEC[id];}
     agendar();
   });
 }
+
 function setConn(ok){
   document.getElementById('dot').className='dot'+(ok?' on':'');
   document.getElementById('connTxt').textContent=ok?'Online':'Offline';
 }
+
 function did(data,tag,idx){return data+'_'+tag.replace(/[^a-zA-Z0-9]/g,'-')+'_'+idx;}
 function getEx(tag,idx){return EXEC[did(ST.data,tag,idx)]||null;}
 function setEx(tag,idx,val){
   var id=did(ST.data,tag,idx);
-  if(val){EXEC[id]=val;if(xNode)xNode.get(id).put({h:val.h,l:val.l,d:ST.data,ts:Date.now()});}
-  else{delete EXEC[id];if(xNode)xNode.get(id).put(null);}
+  if(val){
+    EXEC[id]=val;
+    if(xNode)xNode.get(id).put({h:val.h,l:val.l,d:ST.data,ts:Date.now(),del:false});
+  }else{
+    delete EXEC[id];
+    /* Marcar como deletado em vez de put(null) */
+    if(xNode)xNode.get(id).put({del:true,ts:Date.now()});
+  }
 }
 
 /* ════════ FREQUÊNCIA ════════ */
